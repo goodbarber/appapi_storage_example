@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="GBJSTK.js"></script>
+    <title>Notepad</title>
+    <script>
+
+/**
+ * Add the note to the local storage when click on + button
+ * TODO: When deeplinking methods on GBSTK will be available replace the document.location
+ * by the methods
+ */
+function add_note(){
+    if(localStorage.getItem("notes") === null){
+        localStorage.setItem("notes", JSON.stringify({}));
+    }
+    let notes_object = JSON.parse(localStorage.getItem("notes"));
+    let date_note = new Date().getTime();
+    notes_object[date_note] = "";
+    localStorage.setItem("notes", JSON.stringify(notes_object));
+
+    document.location = `https://hotel2.goodbarber.app/apiv3/section/48118191/editnote.html?note=${date_note}`
+    // gbNavigatePush("editnote?notes=9", {"notes": 9});
+    // TODO: Add the redirect to the plugin note edit page
+    // With date note in query string
+}
+
+/**
+ * Triggered by clicking on a note.
+ * Recover the id of note and redirect to the page for editing it
+ * TODO: When deeplinking methods on GBSTK will be available replace the document.location
+ * by the methods
+ */
+function edit_note(event){
+    let note = event.currentTarget;
+    console.log(note.id);
+    document.location = `https://hotel2.goodbarber.app/apiv3/section/48118191/editnote.html?note=${note.id}`
+}
+
+/**
+ * Format the date for the design
+ */
+function format_date(date_note){
+    let date_array = date_note.toDateString().split(" ");
+    let day_name = date_array[0];
+    let month_name = date_array[1];
+    let day_number = date_array[2];
+    let year = date_array[3];
+    return month_name + ' ' + day_number + ',' + year;
+}
+
+/**
+ * Recover all the notes stored in the localstorage and display them
+ * TODO: When localstorage methods on GBSTK will be available replace the localstorage
+ * by them
+ */
+function get_all_notes(){
+    if(localStorage.getItem("notes") !== null){
+        let localstorage_keys = Object.keys(localStorage);
+        // for(const key of localstorage_keys){
+        //     gbAlert("localstorage key", key);
+        // }
+        let notes_object = JSON.parse(localStorage.getItem("notes"));
+        // gbAlert("notes object", notes_object);
+        keys = Object.keys(notes_object);
+        console.log(keys);
+        // gbAlert("notes object keys:", notes_object);
+        let note_block = document.getElementById('note-block');
+        for (const key of keys) {
+            // gbAlert("key", key);
+            // gbAlert("key", notes_object[key]);
+            let new_note_container = document.createElement("div");
+            let new_note_content = document.createElement("div");
+            let new_note_date = document.createElement("div");
+            new_note_container.className = "notes";
+            new_note_container.id = key;
+            new_note_content.className = "note-content";
+            new_note_date.className = "note-content-date";
+            new_note_content.innerHTML = notes_object[key];
+            new_note_date.innerHTML = format_date(new Date(parseInt(key)));
+            new_note_container.appendChild(new_note_content);
+            new_note_container.appendChild(new_note_date);
+            note_block.appendChild(new_note_container);
+            new_note_container.addEventListener('click', edit_note)
+        }
+    }
+}
+
+    </script>
+</head>
+<body>
+    <div class="note-container">
+        <div class="note-block" id="note-block">
+            <div class="button-add-note" onclick="add_note()">
+                +
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    get_all_notes()
+</script>
+</html>

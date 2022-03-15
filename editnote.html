@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="GBJSTK.js"></script>
+    <title>Notepad</title>
+    <script>
+
+/**
+ * Format the date for the design
+ */
+function format_date(date_note){
+    let date_array = date_note.toDateString().split(" ");
+    let day_name = date_array[0];
+    let month_name = date_array[1];
+    let day_number = date_array[2];
+    let year = date_array[3];
+    return month_name + ' ' + day_number + ',' + year;
+}
+
+/**
+ * Get the note key from the query param 
+ */
+function get_note_key(){
+    let url = new URL(window.location.href);
+    // gbAlert("URL", url);
+    let note_key = parseInt(url.searchParams.get("note"));
+    // gbAlert("note_key", note_key);
+    return note_key
+}
+
+/**
+ * Manage the note that will be update or delete
+ */
+function manage_note(){
+    let note_key = get_note_key();
+    let notes_object = JSON.parse(localStorage.getItem("notes"));
+    let localstorage_keys = Object.keys(localStorage);
+    // for(key of localstorage_keys){
+    //     gbAlert("localstorage key", key);
+    // }
+    // gbAlert("localstorage", localStorage);
+    // gbAlert("notes object", notes_object);
+    let note_date = document.getElementById('note-date');
+    let delete_button = document.getElementsByClassName('delete-button')[0];
+    let note_text = document.getElementById('note-text');
+    let date = (new Date(note_key));
+    note_text.innerHTML = notes_object[note_key];
+    note_date.innerHTML = format_date(date);
+    note_text.addEventListener('DOMSubtreeModified', (event) => {
+        // let notes_object = JSON.parse(localStorage.getItem("notes"));
+        notes_object[note_key] = note_text.innerHTML;
+        localStorage.setItem("notes", JSON.stringify(notes_object));
+    });
+}
+
+/**
+ * Delete the note with the help of the note key from localstorage
+ * and back to the index with all notes
+ */
+function delete_note(note_key){
+    let notes_object = JSON.parse(localStorage.getItem("notes"));
+    delete notes_object[note_key];
+    localStorage.setItem("notes", JSON.stringify(notes_object));
+    gbNavigateBack();
+}
+
+    </script>
+</head>
+<body>
+    <div class="note-container">
+        <div class="note-block">
+            <div style="text-align: right;">
+                <div class="back-button" onclick="gbNavigateBack()">
+                    back
+                </div>
+                <div class="delete-button" onclick="delete_note(get_note_key())">
+                    delete
+                </div>
+            </div>
+            <div class="note-date" id="note-date">
+                May 21,2020
+            </div>
+            <p><span class="textarea" role="textbox" contenteditable id="note-text"></span></p>
+        </div>
+    </div>
+</body>
+<script>
+manage_note()
+</script>
+</html>

@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #252525;
+    padding: 0;
+    margin: 0;
+    font-weight: normal;
+}
+
+.note-container{
+    margin-top: 10vh;
+    height: 90vh;
+    width: 100vw;
+    color: white;
+}
+
+.note-date{
+    margin-bottom: 20px;
+    color: #737373;
+    font-weight: 400;
+}
+
+.note-content {
+    height: 82px;
+    color: black;
+    font-size: 21px;
+    font-weight: 400;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    line-height: 28px;
+}
+.note-content-date {
+    margin-top: 6px;
+    text-align: right;
+    color: #737373;
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.notes{
+    height: 130px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.notes:nth-child(5n+2){
+    background-color: #f3b097;
+}
+
+.notes:nth-child(5n+3){
+    background-color: #f6cc8b;
+}
+
+.notes:nth-child(5n+4){
+    background-color: #e9eda5;
+}
+
+.notes:nth-child(5n+5){
+    background-color: #97dde9;
+}
+
+.notes:nth-child(5n+6){
+    background-color: #c799d7;
+}
+
+.note-block{
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+.textarea {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    resize: both;
+    min-height: 40px;
+    line-height: 28px;
+    font-size: 21px;
+    font-weight: 400;
+    outline: none;
+    resize: none;
+}
+
+.textarea[contenteditable]:empty::before {
+    content: "Write something...";
+    color: gray;
+}
+
+.button-add-note{
+    border: solid 6px #545454;
+    box-sizing: border-box;
+    color: #545454;
+    font-size: 50px;
+    font-weight: 500;
+    border-radius: 10px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 140px;
+    height: 140px;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.delete-button{
+    display: inline-block;;
+    background-color: red;
+    color: white;
+    padding: 5px;
+    border-radius: 7px;
+    width: 60px;
+    text-align: center;
+    margin: 5px;
+}
+
+.back-button{
+    display: inline-block;;
+    background-color: black;
+    color: white;
+    padding: 5px;
+    border-radius: 7px;
+    width: 60px;
+    text-align: center;
+    margin: 5px;
+}
