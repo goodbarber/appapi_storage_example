@@ -10,35 +10,32 @@
     <script>
 
 /**
- * Add the note to the local storage when click on + button
- * TODO: When deeplinking methods on GBSTK will be available replace the document.location
+ * Add the note to the GB storage when click on + button
  * by the methods
  */
 function add_note(){
-    if(localStorage.getItem("notes") === null){
-        localStorage.setItem("notes", JSON.stringify({}));
-    }
-    let notes_object = JSON.parse(localStorage.getItem("notes"));
-    let date_note = new Date().getTime();
-    notes_object[date_note] = "";
-    localStorage.setItem("notes", JSON.stringify(notes_object));
-
-    document.location = `https://hotel2.goodbarber.app/apiv3/section/48118191/editnote.html?note=${date_note}`
-    // gbNavigatePush("editnote?notes=9", {"notes": 9});
-    // TODO: Add the redirect to the plugin note edit page
-    // With date note in query string
+    gb.storage.getItem("notes", (item) => {
+        let notes = item;
+        if(!item){
+            notes = {};
+            gb.storage.setItem("notes", notes);
+        } else{
+            notes = JSON.parse(notes);
+        }
+        let date_note = new Date().getTime();
+        notes[date_note.toString()] = "";
+        gb.storage.setItem("notes", notes);
+        gb.location = "editnote?note=" + date_note;
+    });
 }
 
 /**
  * Triggered by clicking on a note.
  * Recover the id of note and redirect to the page for editing it
- * TODO: When deeplinking methods on GBSTK will be available replace the document.location
- * by the methods
  */
 function edit_note(event){
     let note = event.currentTarget;
-    console.log(note.id);
-    document.location = `https://hotel2.goodbarber.app/apiv3/section/48118191/editnote.html?note=${note.id}`
+    gb.location = `editnote?note=${note.id}`;
 }
 
 /**
@@ -55,24 +52,19 @@ function format_date(date_note){
 
 /**
  * Recover all the notes stored in the localstorage and display them
- * TODO: When localstorage methods on GBSTK will be available replace the localstorage
- * by them
  */
 function get_all_notes(){
-    if(localStorage.getItem("notes") !== null){
-        let localstorage_keys = Object.keys(localStorage);
-        // for(const key of localstorage_keys){
-        //     gbAlert("localstorage key", key);
-        // }
-        let notes_object = JSON.parse(localStorage.getItem("notes"));
-        // gbAlert("notes object", notes_object);
+    gb.storage.getItem("notes", (item)=>{
+        if(!item){
+            return;
+        }
+        notes_object = JSON.parse(item);
         keys = Object.keys(notes_object);
-        console.log(keys);
-        // gbAlert("notes object keys:", notes_object);
         let note_block = document.getElementById('note-block');
+        let plus_btn = document.getElementById('plus-btn');
+        note_block.replaceChildren();
+        note_block.appendChild(plus_btn);
         for (const key of keys) {
-            // gbAlert("key", key);
-            // gbAlert("key", notes_object[key]);
             let new_note_container = document.createElement("div");
             let new_note_content = document.createElement("div");
             let new_note_date = document.createElement("div");
@@ -85,9 +77,9 @@ function get_all_notes(){
             new_note_container.appendChild(new_note_content);
             new_note_container.appendChild(new_note_date);
             note_block.appendChild(new_note_container);
-            new_note_container.addEventListener('click', edit_note)
+            new_note_container.addEventListener('click', edit_note);
         }
-    }
+    })
 }
 
     </script>
@@ -95,13 +87,17 @@ function get_all_notes(){
 <body>
     <div class="note-container">
         <div class="note-block" id="note-block">
-            <div class="button-add-note" onclick="add_note()">
+            <div class="button-add-note" onclick="add_note()" id="plus-btn">
                 +
             </div>
         </div>
     </div>
 </body>
 <script>
-    get_all_notes()
+function gbViewDidAppear()
+{
+    get_all_notes();
+}
+gb.onload = get_all_notes();
 </script>
 </html>

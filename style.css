@@ -9,13 +9,16 @@ body {
 }
 
 .note-container{
-    margin-top: 10vh;
+    margin-top: 4vh;
     height: 90vh;
     width: 100vw;
     color: white;
 }
 
 .note-date{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
     margin-bottom: 20px;
     color: #737373;
     font-weight: 400;

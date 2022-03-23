@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style.css">
     <script src="GBJSTK.js"></script>
     <title>Notepad</title>
@@ -25,10 +26,7 @@ function format_date(date_note){
  * Get the note key from the query param 
  */
 function get_note_key(){
-    let url = new URL(window.location.href);
-    // gbAlert("URL", url);
-    let note_key = parseInt(url.searchParams.get("note"));
-    // gbAlert("note_key", note_key);
+    let note_key = parseInt(gb.location.params()['note']);
     return note_key
 }
 
@@ -36,24 +34,20 @@ function get_note_key(){
  * Manage the note that will be update or delete
  */
 function manage_note(){
-    let note_key = get_note_key();
-    let notes_object = JSON.parse(localStorage.getItem("notes"));
-    let localstorage_keys = Object.keys(localStorage);
-    // for(key of localstorage_keys){
-    //     gbAlert("localstorage key", key);
-    // }
-    // gbAlert("localstorage", localStorage);
-    // gbAlert("notes object", notes_object);
-    let note_date = document.getElementById('note-date');
-    let delete_button = document.getElementsByClassName('delete-button')[0];
-    let note_text = document.getElementById('note-text');
-    let date = (new Date(note_key));
-    note_text.innerHTML = notes_object[note_key];
-    note_date.innerHTML = format_date(date);
-    note_text.addEventListener('DOMSubtreeModified', (event) => {
-        // let notes_object = JSON.parse(localStorage.getItem("notes"));
-        notes_object[note_key] = note_text.innerHTML;
-        localStorage.setItem("notes", JSON.stringify(notes_object));
+    note_key = get_note_key();
+    gb.storage.getItem("notes", (item) => {
+        notes_object = JSON.parse(item);
+        let note_date_container = document.getElementById('note-date');
+        let note_date = note_date_container.firstElementChild;
+        let note_text = document.getElementById('note-text');
+        let date = (new Date(note_key));
+        note_text.innerHTML = notes_object[note_key];
+        note_date.innerHTML = format_date(date);
+        note_text.addEventListener('DOMSubtreeModified', (event) => {
+            // let notes_object = JSON.parse(localStorage.getItem("notes"));
+            notes_object[note_key] = note_text.innerHTML;
+            gb.storage.setItem("notes", notes_object);
+        });
     });
 }
 
@@ -62,10 +56,12 @@ function manage_note(){
  * and back to the index with all notes
  */
 function delete_note(note_key){
-    let notes_object = JSON.parse(localStorage.getItem("notes"));
-    delete notes_object[note_key];
-    localStorage.setItem("notes", JSON.stringify(notes_object));
-    gbNavigateBack();
+    gb.storage.getItem("notes", (item) => {
+        item = JSON.parse(item);
+        delete item[note_key];
+        gb.storage.setItem("notes", JSON.stringify(item));
+        gb.location.back();
+    });
 }
 
     </script>
@@ -73,22 +69,25 @@ function delete_note(note_key){
 <body>
     <div class="note-container">
         <div class="note-block">
-            <div style="text-align: right;">
-                <div class="back-button" onclick="gbNavigateBack()">
-                    back
-                </div>
-                <div class="delete-button" onclick="delete_note(get_note_key())">
-                    delete
-                </div>
-            </div>
             <div class="note-date" id="note-date">
-                May 21,2020
+                <div>
+                    May 21,2020
+                </div>
+                <div onclick="delete_note(get_note_key());">
+                    <i class="fa fa-trash" aria-hidden="true" style="font-size: 20px;"></i>
+                </div>
             </div>
             <p><span class="textarea" role="textbox" contenteditable id="note-text"></span></p>
         </div>
     </div>
 </body>
 <script>
-manage_note()
+
+function gbViewDidAppear()
+{
+    manage_note();
+}
+gb.onload = manage_note();
+
 </script>
 </html>
