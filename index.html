@@ -45,12 +45,10 @@ function format_date(date_note){
  * Recursive function that generate note container and set it with the correct id
  */
 function call_get_item(all_note_ids){
-    console.log(all_note_ids);
     if(all_note_ids.length == 0){
         return;
     }
     gb.storage.getItem(all_note_ids[all_note_ids.length-1], (note_content) => {
-        console.log(all_note_ids[all_note_ids.length-1]);
         // Generate all the dom related to the notes
         let note_id = all_note_ids[all_note_ids.length-1];
         let timestamp_note = all_note_ids[all_note_ids.length-1].split('_')[1];

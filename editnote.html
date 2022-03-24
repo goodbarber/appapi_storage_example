@@ -36,7 +36,6 @@ function get_note_key(){
  */
 function manage_note(){
     note_key = get_note_key();
-    console.log("note key: " + note_key);
     gb.storage.getItem(note_key, (item) => {
         let note_date_container = document.getElementById('note-date');
         let note_date = note_date_container.firstElementChild;
@@ -46,7 +45,6 @@ function manage_note(){
         note_date.innerHTML = format_date(date);
         note_text.addEventListener('DOMSubtreeModified', (event) => {
             item = note_text.innerHTML;
-            console.log(item);
             gb.storage.setItem(note_key, item);
         });
     });
