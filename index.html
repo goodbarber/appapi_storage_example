@@ -14,19 +14,10 @@
  * by the methods
  */
 function add_note(){
-    gb.storage.getItem("notes", (item) => {
-        let notes = item;
-        if(!item){
-            notes = {};
-            gb.storage.setItem("notes", notes);
-        } else{
-            notes = JSON.parse(notes);
-        }
-        let date_note = new Date().getTime();
-        notes[date_note.toString()] = "";
-        gb.storage.setItem("notes", notes);
-        gb.location = "editnote?note=" + date_note;
-    });
+    let date_note = new Date().getTime();
+    let id_note = "note_" + date_note.toString();
+    gb.storage.setItem(id_note, "");
+    gb.location = "editnote?note=" + id_note;
 }
 
 /**
@@ -51,35 +42,57 @@ function format_date(date_note){
 }
 
 /**
+ * Recursive function that generate note container and set it with the correct id
+ */
+function call_get_item(all_note_ids){
+    console.log(all_note_ids);
+    if(all_note_ids.length == 0){
+        return;
+    }
+    gb.storage.getItem(all_note_ids[all_note_ids.length-1], (note_content) => {
+        console.log(all_note_ids[all_note_ids.length-1]);
+        // Generate all the dom related to the notes
+        let note_id = all_note_ids[all_note_ids.length-1];
+        let timestamp_note = all_note_ids[all_note_ids.length-1].split('_')[1];
+        let new_note_container = document.createElement("div");
+        let new_note_content = document.createElement("div");
+        let new_note_date = document.createElement("div");
+        new_note_container.className = "notes";
+        // Set the id to the corresponding note key from storage
+        new_note_container.id = note_id;
+        // Set the content of note
+        new_note_content.innerHTML = note_content;
+        new_note_content.className = "note-content";
+        new_note_date.className = "note-content-date";
+        new_note_date.innerHTML = format_date(new Date(parseInt(timestamp_note)));
+        new_note_container.appendChild(new_note_content);
+        new_note_container.appendChild(new_note_date);
+        note_block.appendChild(new_note_container);
+        new_note_container.addEventListener('click', edit_note);
+        all_note_ids.pop();
+        call_get_item(all_note_ids);
+    });
+}
+
+/**
  * Recover all the notes stored in the localstorage and display them
  */
 function get_all_notes(){
-    gb.storage.getItem("notes", (item)=>{
-        if(!item){
-            return;
+    all_note_ids = []
+    // Get all the keys from storage and filter the keys corresponding to notes
+    gb.storage.keys( async (keys) => {
+        for(const key of keys){
+            prefix = key.split('_')[0]
+            if(prefix == 'note'){
+                all_note_ids.push(key);
+            }
         }
-        notes_object = JSON.parse(item);
-        keys = Object.keys(notes_object);
-        let note_block = document.getElementById('note-block');
+        note_block = document.getElementById('note-block');
         let plus_btn = document.getElementById('plus-btn');
         note_block.replaceChildren();
         note_block.appendChild(plus_btn);
-        for (const key of keys) {
-            let new_note_container = document.createElement("div");
-            let new_note_content = document.createElement("div");
-            let new_note_date = document.createElement("div");
-            new_note_container.className = "notes";
-            new_note_container.id = key;
-            new_note_content.className = "note-content";
-            new_note_date.className = "note-content-date";
-            new_note_content.innerHTML = notes_object[key];
-            new_note_date.innerHTML = format_date(new Date(parseInt(key)));
-            new_note_container.appendChild(new_note_content);
-            new_note_container.appendChild(new_note_date);
-            note_block.appendChild(new_note_container);
-            new_note_container.addEventListener('click', edit_note);
-        }
-    })
+        call_get_item(all_note_ids);
+    });
 }
 
     </script>
