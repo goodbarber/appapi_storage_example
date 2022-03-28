@@ -13,7 +13,7 @@
 /**
  * Format the date for the design
  */
-function format_date(date_note){
+function formatDate(date_note){
     let date_array = date_note.toDateString().split(" ");
     let day_name = date_array[0];
     let month_name = date_array[1];
@@ -25,7 +25,7 @@ function format_date(date_note){
 /**
  * Get the note key from the query param 
  */
-function get_note_key(){
+function getNoteKey(){
     // Recovering of the note key from query param 'note'
     let note_key = gb.location.params()['note'];
     return note_key
@@ -34,15 +34,16 @@ function get_note_key(){
 /**
  * Manage the note that will be update or delete
  */
-function manage_note(){
-    note_key = get_note_key();
+function manageNote(){
+    note_key = getNoteKey();
     gb.storage.getItem(note_key, (item) => {
         let note_date_container = document.getElementById('note-date');
         let note_date = note_date_container.firstElementChild;
         let note_text = document.getElementById('note-text');
         let date = (new Date(parseInt(note_key.split('_')[1])));
         note_text.innerHTML = item;
-        note_date.innerHTML = format_date(date);
+        note_date.innerHTML = formatDate(date);
+        // Event listener on form change and update the gb storage with the new content
         note_text.addEventListener('DOMSubtreeModified', (event) => {
             item = note_text.innerHTML;
             gb.storage.setItem(note_key, item);
@@ -51,10 +52,10 @@ function manage_note(){
 }
 
 /**
- * Delete the note with the help of the note key from localstorage
+ * Delete the note with the help of the note key from GB storage
  * and back to the index with all notes
  */
-function delete_note(note_key){
+function deleteNote(note_key){
     gb.storage.removeItem(note_key);
     gb.location.back();
 }
@@ -68,7 +69,7 @@ function delete_note(note_key){
                 <div>
                     May 21,2020
                 </div>
-                <div onclick="delete_note(get_note_key());">
+                <div onclick="deleteNote(getNoteKey());">
                     <i class="fa fa-trash" aria-hidden="true" style="font-size: 20px;"></i>
                 </div>
             </div>
@@ -80,9 +81,9 @@ function delete_note(note_key){
 
 function gbViewDidAppear()
 {
-    manage_note();
+    manageNote();
 }
-gb.onload = manage_note();
+gb.onload = manageNote();
 
 </script>
 </html>

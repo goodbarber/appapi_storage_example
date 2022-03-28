@@ -13,7 +13,7 @@
  * Add the note to the GB storage when click on + button
  * by the methods
  */
-function add_note(){
+function addNote(){
     let date_note = new Date().getTime();
     let id_note = "note_" + date_note.toString();
     gb.storage.setItem(id_note, "");
@@ -24,7 +24,7 @@ function add_note(){
  * Triggered by clicking on a note.
  * Recover the id of note and redirect to the page for editing it
  */
-function edit_note(event){
+function editNote(event){
     let note = event.currentTarget;
     gb.location = `editnote?note=${note.id}`;
 }
@@ -43,15 +43,16 @@ function format_date(date_note){
 
 /**
  * Recursive function that generate note container and set it with the correct id
+ * calling gb.storage.getItem()
  */
-function call_get_item(all_note_ids){
+function callGetItem(all_note_ids){
     if(all_note_ids.length == 0){
         return;
     }
     gb.storage.getItem(all_note_ids[all_note_ids.length-1], (note_content) => {
         // Generate all the dom related to the notes
         let note_id = all_note_ids[all_note_ids.length-1];
-        let timestamp_note = all_note_ids[all_note_ids.length-1].split('_')[1];
+        let timestamp_note = note_id.split('_')[1];
         let new_note_container = document.createElement("div");
         let new_note_content = document.createElement("div");
         let new_note_date = document.createElement("div");
@@ -66,19 +67,19 @@ function call_get_item(all_note_ids){
         new_note_container.appendChild(new_note_content);
         new_note_container.appendChild(new_note_date);
         note_block.appendChild(new_note_container);
-        new_note_container.addEventListener('click', edit_note);
+        new_note_container.addEventListener('click', editNote);
         all_note_ids.pop();
-        call_get_item(all_note_ids);
+        callGetItem(all_note_ids);
     });
 }
 
 /**
  * Recover all the notes stored in the localstorage and display them
  */
-function get_all_notes(){
+function getAllNotes(){
     all_note_ids = []
     // Get all the keys from storage and filter the keys corresponding to notes
-    gb.storage.keys( async (keys) => {
+    gb.storage.keys( (keys) => {
         for(const key of keys){
             prefix = key.split('_')[0]
             if(prefix == 'note'){
@@ -89,7 +90,7 @@ function get_all_notes(){
         let plus_btn = document.getElementById('plus-btn');
         note_block.replaceChildren();
         note_block.appendChild(plus_btn);
-        call_get_item(all_note_ids);
+        callGetItem(all_note_ids);
     });
 }
 
@@ -98,7 +99,7 @@ function get_all_notes(){
 <body>
     <div class="note-container">
         <div class="note-block" id="note-block">
-            <div class="button-add-note" onclick="add_note()" id="plus-btn">
+            <div class="button-add-note" onclick="addNote()" id="plus-btn">
                 +
             </div>
         </div>
@@ -107,8 +108,8 @@ function get_all_notes(){
 <script>
 function gbViewDidAppear()
 {
-    get_all_notes();
+    getAllNotes();
 }
-gb.onload = get_all_notes();
+gb.onload = getAllNotes();
 </script>
 </html>
