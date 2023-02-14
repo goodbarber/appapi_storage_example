@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <script src="GBJSTK.js"></script>
     <title>Notepad</title>
     <script>
 
@@ -80,17 +79,19 @@ function getAllNotes(){
     all_note_ids = []
     // Get all the keys from storage and filter the keys corresponding to notes
     gb.storage.keys( (keys) => {
-        for(const key of keys){
-            prefix = key.split('_')[0]
-            if(prefix == 'note'){
-                all_note_ids.push(key);
+        if (keys) {
+            for(const key of keys){
+                prefix = key.split('_')[0]
+                if(prefix == 'note'){
+                    all_note_ids.push(key);
+                }
             }
+            note_block = document.getElementById('note-block');
+            let plus_btn = document.getElementById('plus-btn');
+            note_block.replaceChildren();
+            note_block.appendChild(plus_btn);
+            callGetItem(all_note_ids);
         }
-        note_block = document.getElementById('note-block');
-        let plus_btn = document.getElementById('plus-btn');
-        note_block.replaceChildren();
-        note_block.appendChild(plus_btn);
-        callGetItem(all_note_ids);
     });
 }
 
@@ -106,10 +107,8 @@ function getAllNotes(){
     </div>
 </body>
 <script>
-function gbViewDidAppear()
-{
+gb.onappear =  () => {
     getAllNotes();
 }
-gb.onload = getAllNotes();
 </script>
 </html>
