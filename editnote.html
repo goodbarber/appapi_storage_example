@@ -12,41 +12,31 @@
 /**
  * Format the date for the design
  */
-function formatDate(date_note){
-    let date_array = date_note.toDateString().split(" ");
-    let day_name = date_array[0];
-    let month_name = date_array[1];
-    let day_number = date_array[2];
-    let year = date_array[3];
-    return month_name + ' ' + day_number + ',' + year;
+function formatDate(dateNote){
+    let dateArray = dateNote.toDateString().split(" ");
+    let dayName = dateArray[0];
+    let monthName = dateArray[1];
+    let dayNumber = dateArray[2];
+    let year = dateArray[3];
+    return monthName + ' ' + dayNumber + ',' + year;
 }
 
 /**
  * Get the note key from the query param 
  */
-function getNoteKey(){
+function getNoteId(){
     // Recovering of the note key from query param 'note'
-    let note_key = gb.location.params()['note'];
-    return note_key
+    let noteId = gb.location.params()['note'];
+    return noteId
 }
 
 /**
  * Manage the note that will be update or delete
  */
-function manageNote(){
-    note_key = getNoteKey();
-    gb.storage.getItem(note_key, (item) => {
-        let note_date_container = document.getElementById('note-date');
-        let note_date = note_date_container.firstElementChild;
-        let note_text = document.getElementById('note-text');
-        let date = (new Date(parseInt(note_key.split('_')[1])));
-        note_text.innerHTML = item;
-        note_date.innerHTML = formatDate(date);
-        // Event listener on form change and update the gb storage with the new content
-        note_text.addEventListener('DOMSubtreeModified', (event) => {
-            item = note_text.innerHTML;
-            gb.storage.setItem(note_key, item);
-        });
+function getNote(){
+    noteId = getNoteId();
+    gb.storage.getItem(noteId, (value) => {
+        displayNote(noteId, value);
     });
 }
 
@@ -54,9 +44,24 @@ function manageNote(){
  * Delete the note with the help of the note key from GB storage
  * and back to the index with all notes
  */
-function deleteNote(note_key){
-    gb.storage.removeItem(note_key);
+function deleteNote(noteId){
+    gb.storage.removeItem(noteId);
     gb.location.back();
+}
+
+
+function displayNote(noteId, value) {
+    let noteDateContainer = document.getElementById('note-date');
+    let noteDate = noteDateContainer.firstElementChild;
+    let noteText = document.getElementById('note-text');
+    let date = (new Date(parseInt(noteId.split('_')[1])));
+    noteText.innerHTML = value;
+    noteDate.innerHTML = formatDate(date);
+    // Event listener on form change and update the gb storage with the new content
+    noteText.addEventListener('DOMSubtreeModified', (event) => {
+        value = noteText.innerHTML;
+        gb.storage.setItem(noteId, value);
+    });
 }
 
     </script>
@@ -79,7 +84,7 @@ function deleteNote(note_key){
 <script>
 
 gb.onload =  () => {
-    manageNote();
+    getNote();
 }
 
 </script>
