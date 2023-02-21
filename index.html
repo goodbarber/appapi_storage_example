@@ -42,7 +42,7 @@ function formatDate(dateNote){
 
 /**
  * Recursive function that generate note container and set it with the correct id
- * calling gb.storage.getItem()
+ * calling gb.storage.getItem() and the help of an array that contains all the note ids.
  */
 function getNotesRecursive(allNoteIds){
     if(allNoteIds.length == 0){
@@ -69,7 +69,6 @@ function getAllNotes(){
                 prefix = key.split('_')[0]
                 if(prefix == 'note'){
                     allNoteIds.push(key);
-                    // getNote(key);
                 }
             }
             noteBlock = document.getElementById('note-block');
