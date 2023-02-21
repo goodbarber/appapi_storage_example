@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Notepad</title>
+    <script>
+
+/**
+ * Add the note to the GB storage when click on + button
+ * by the methods
+ */
+function addNote(){
+    let dateNote = new Date().getTime();
+    let noteId = "note_" + dateNote.toString();
+    gb.storage.setItem(noteId, "");
+    gb.location = "editnote?note=" + noteId;
+}
+
+/**
+ * Triggered by clicking on a note.
+ * Recover the id of note and redirect to the page for editing it
+ */
+function editNote(event){
+    let note = event.currentTarget;
+    gb.location = `editnote?note=${note.id}`;
+}
+
+/**
+ * Format the date for the design
+ */
+function formatDate(dateNote){
+    let dateArray = dateNote.toDateString().split(" ");
+    let dayName = dateArray[0];
+    let monthName = dateArray[1];
+    let dayNumber = dateArray[2];
+    let year = dateArray[3];
+    return monthName + ' ' + dayNumber + ',' + year;
+}
+
+/**
+ * Recursive function that generate note container and set it with the correct id
+ * calling gb.storage.getItem() and the help of an array that contains all the note ids.
+ */
+function getNotesRecursive(allNoteIds){
+    if(allNoteIds.length == 0){
+        return;
+    }
+    gb.storage.getItem(allNoteIds[allNoteIds.length-1], (noteContent) => {
+        // Generate all the dom related to the notes
+        let noteId = allNoteIds[allNoteIds.length-1];
+        displayNote(noteId, noteContent);
+        allNoteIds.pop();
+        getNotesRecursive(allNoteIds);
+    });
+}
+
+/**
+ * Recover all the notes stored in the localstorage and display them
+ */
+function getAllNotes(){
+    allNoteIds = []
+    // Get all the keys from storage and filter the keys corresponding to notes
+    gb.storage.keys( (keys) => {
+        if (keys) {
+            for(const key of keys){
+                prefix = key.split('_')[0]
+                if(prefix == 'note'){
+                    allNoteIds.push(key);
+                }
+            }
+            noteBlock = document.getElementById('note-block');
+            let plusBtn = document.getElementById('plus-btn');
+            noteBlock.replaceChildren();
+            noteBlock.appendChild(plusBtn);
+            getNotesRecursive(allNoteIds);
+        }
+    });
+}
+
+function displayNote(noteId, noteContent) {
+    let timestampNote = noteId.split('_')[1];
+    let newNoteContainer = document.createElement("div");
+    let newNoteContent = document.createElement("div");
+    let newNoteDate = document.createElement("div");
+    newNoteContainer.className = "notes";
+    // Set the id to the corresponding note key from storage
+    newNoteContainer.id = noteId;
+    // Set the content of note
+    newNoteContent.innerHTML = noteContent;
+    newNoteContent.className = "note-content";
+    newNoteDate.className = "note-content-date";
+    newNoteDate.innerHTML = formatDate(new Date(parseInt(timestampNote)));
+    newNoteContainer.appendChild(newNoteContent);
+    newNoteContainer.appendChild(newNoteDate);
+    noteBlock.appendChild(newNoteContainer);
+    newNoteContainer.addEventListener('click', editNote);
+}
+
+
+    </script>
+</head>
+<body>
+    <div class="note-container">
+        <div class="note-block" id="note-block">
+            <div class="button-add-note" onclick="addNote()" id="plus-btn">
+                +
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+gb.onappear =  () => {
+    getAllNotes();
+}
+</script>
+</html>

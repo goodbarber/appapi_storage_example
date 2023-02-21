@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+    <title>Notepad</title>
+    <script>
+
+/**
+ * Format the date for the design
+ */
+function formatDate(dateNote){
+    let dateArray = dateNote.toDateString().split(" ");
+    let dayName = dateArray[0];
+    let monthName = dateArray[1];
+    let dayNumber = dateArray[2];
+    let year = dateArray[3];
+    return monthName + ' ' + dayNumber + ',' + year;
+}
+
+/**
+ * Get the note key from the query param 
+ */
+function getNoteId(){
+    // Recovering of the note key from query param 'note'
+    let noteId = gb.location.params()['note'];
+    return noteId
+}
+
+/**
+ * Manage the note that will be update or delete
+ */
+function getNote(){
+    noteId = getNoteId();
+    gb.storage.getItem(noteId, (value) => {
+        displayNote(noteId, value);
+    });
+}
+
+/**
+ * Delete the note with the help of the note key from GB storage
+ * and back to the index with all notes
+ */
+function deleteNote(noteId){
+    gb.storage.removeItem(noteId);
+    gb.location.back();
+}
+
+
+function displayNote(noteId, value) {
+    let noteDateContainer = document.getElementById('note-date');
+    let noteDate = noteDateContainer.firstElementChild;
+    let noteText = document.getElementById('note-text');
+    let date = (new Date(parseInt(noteId.split('_')[1])));
+    noteText.innerHTML = value;
+    noteDate.innerHTML = formatDate(date);
+    // Event listener on form change and update the gb storage with the new content
+    noteText.addEventListener('DOMSubtreeModified', (event) => {
+        value = noteText.innerHTML;
+        gb.storage.setItem(noteId, value);
+    });
+}
+
+    </script>
+</head>
+<body>
+    <div class="note-container">
+        <div class="note-block">
+            <div class="note-date" id="note-date">
+                <div>
+                    May 21,2020
+                </div>
+                <div onclick="deleteNote(getNoteKey());">
+                    <i class="fa fa-trash" aria-hidden="true" style="font-size: 20px;"></i>
+                </div>
+            </div>
+            <p><span class="textarea" role="textbox" contenteditable id="note-text"></span></p>
+        </div>
+    </div>
+</body>
+<script>
+
+gb.onload =  () => {
+    getNote();
+}
+
+</script>
+</html>
